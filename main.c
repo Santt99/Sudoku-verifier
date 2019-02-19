@@ -5,7 +5,8 @@
 
 //Costants
 #define THREADS 27
-
+#define COLUMNS 9
+#define ROWS 9
 //Global Variables
 char valid = '1';
 int row = 0;
@@ -37,17 +38,19 @@ int main(int argc, char *argv[]) {
     getDataFromfile((void *) sudoku, file);
     fclose(file);
 
-    for(int x = 0; x < 9; x++){
+    for(int x = 0; x < ROWS; x++){
         pthread_create(&tid[x], &attr[x], validateRow, (void *) sudoku);
     }
-    row = 0;
+    for(int x = COLUMNS; x < COLUMNS + COLUMNS; x++){
+        pthread_create(&tid[x], &attr[x], validateColumn, (void *) sudoku);
+    }
 
 }
 
 void printGrid(void * param){
-    int(*sudoku)[9] = param;
-    for(int x = 0; x < 9; x++){
-        for(int y = 0; y < 9; y++){
+    int(*sudoku)[ROWS] = param;
+    for(int x = 0; x < ROWS; x++){
+        for(int y = 0; y < COLUMNS; y++){
             printf("%d ", sudoku[x][y]);
         }
         printf("\n");
@@ -55,22 +58,22 @@ void printGrid(void * param){
 }
 void getDataFromfile(void * param, FILE * file){
     int index;
-    int (*sudoku)[9] = param;
-    for(int i = 0; i < 9; i++){
-        for(int j = 0; j < 9; j++){
+    int (*sudoku)[ROWS] = param;
+    for(int i = 0; i < COLUMNS; i++){
+        for(int j = 0; j < ROWS; j++){
             fscanf(file, "%d", &sudoku[j][i]);
             index++;
         }
     }
 }
 void validateRow(void *param){
-    int (*rows)[9] = param;
+    int (*sudoku)[ROWS] = param;
     int sum = 0;  
     for(int i = 0; i < 9; i++){
-        sum += rows[row][i];
+        sum += sudoku[row][i];
         if(sum > 45){
             valid = '0';
-        }else if(rows[i][row] > 9 || rows[row][i] < 1){
+        }else if(sudoku[row][i] > 9 || sudoku[row][i] < 1){
             valid = '0';
         }
     }
@@ -78,5 +81,15 @@ void validateRow(void *param){
     pthread_exit(0);
 }
 void validateColumn(void *param){
-   
+   int (*sudoku)[ROWS] = param;
+   int sum = 0;  
+   for(int i = 0; i < ROWS; i++){
+       sum += sudoku[i][column];
+        if(sum > 45){
+            valid = '0';
+        }else if(sudoku[i][row] > 9 || sudoku[i][column] < 1){
+            valid = '0';
+        }
+   }
+   pthread_exit(0);
 }
