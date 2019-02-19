@@ -40,11 +40,44 @@ int main(int argc, char *argv[]) {
 
     for(int x = 0; x < ROWS; x++){
         pthread_create(&tid[x], &attr[x], validateRow, (void *) sudoku);
+        row++;
     }
+    
     for(int x = COLUMNS; x < COLUMNS + COLUMNS; x++){
         pthread_create(&tid[x], &attr[x], validateColumn, (void *) sudoku);
+        column++;
     }
 
+    column = 0;
+    row = 0;
+    for(int x = COLUMNS + COLUMNS; x < x + 3 ; x++){
+        pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
+        row++;
+    }
+
+    column += 3;
+    row = 0;
+    for(int x = COLUMNS + COLUMNS + 3; x < x + 3; x++){
+        pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
+        row++;
+    }
+
+    row = 0;
+    column += 3;
+    for(int x = COLUMNS + COLUMNS + 6; x < x + 3; x++){
+        pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
+        row++;
+    }
+
+    for(int j = 0; j < THREADS; j++)
+        pthread_join(tid[j], NULL);
+    
+    if(valid == '1'){
+        printf("The Sudoku is valid\n");
+    }
+    else{
+        printf("The Sudoku is't valid\n");
+    }
 }
 
 void printGrid(void * param){
@@ -77,7 +110,6 @@ void validateRow(void *param){
             valid = '0';
         }
     }
-    row++;
     pthread_exit(0);
 }
 void validateColumn(void *param){
@@ -87,9 +119,24 @@ void validateColumn(void *param){
        sum += sudoku[i][column];
         if(sum > 45){
             valid = '0';
-        }else if(sudoku[i][row] > 9 || sudoku[i][column] < 1){
+        }else if(sudoku[i][column] > 9 || sudoku[i][column] < 1){
             valid = '0';
         }
    }
    pthread_exit(0);
+}
+void validateSquare(void *param){
+    int (*sudoku)[ROWS] = param;
+    int sum = 0; 
+    for(int j = row; j < row + 3; j++){
+        for(int k = column; k <  column + 3; i++){
+            sum += sudoku[j][k];
+            if(sum > 45){
+                valid = '0';
+            }else if(sudoku[j][k] > 9 || sudoku[j][k] < 1){
+                valid = '0';
+            }
+        }   
+    }
+    pthread_exit(0);
 }
