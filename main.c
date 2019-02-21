@@ -2,7 +2,6 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 //Costants
 #define THREADS 27
 #define COLUMNS 9
@@ -11,7 +10,8 @@
 char valid = '1';
 int row = 0;
 int column = 0;
-
+int sum = 0; 
+int square = 0;
 //Fuctions
 void getDataFromfile(void * param, FILE * file);
 void *validateRow(void *param);
@@ -48,20 +48,23 @@ int main(int argc, char *argv[]) {
     column = 0;
     row = 0;
     for(int x = 18; x < 21 ; x++){
+        sum=0;
         pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
-        row++;
+        row += 3;
     }
     column += 3;
     row = 0;
     for(int x = 21; x < 24; x++){
+        sum = 0;
         pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
-        row++;
+        row += 3;
     }
-    row = 0;
     column += 3;
+    row = 0;
     for(int x = 24; x < 27; x++){
+        sum = 0;
         pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
-        row++;
+        row += 3;
     }
 
     for(int j = 0; j < 22; j++)
@@ -118,12 +121,31 @@ void *validateColumn(void *param){
    pthread_exit(0);
 }
 void *validateSquare(void *param){
-    int (*sudoku)[ROWS] = param;
-    int sum = 0; 
-    for(int j = row; j < row + 3; j++){
-        for(int k = column; k <  column + 3; k++){
-            
-        }   
+    
+    int (*sudoku)[9] = param;
+    int x = 0, y;
+
+    if(square < 3){
+        x = 0;
+    } 
+    else if (square < 6){
+         x = 3;
     }
+    y = (square % 3)*3;
+    for(int posX = x; posX < x+3; posX++){
+        for(int posY = y; posY < y+3; posY++){
+            for(int i = posX; i < x+3; i++){
+                for(int j = posY; j < y+3; j++){
+                    if(posX != i || posY != j){
+                        if(sudoku[posX][posY] == sudoku[i][j]){
+                            valid = '0';
+                        }
+                    }
+                }
+            }
+        }
+    }
+    square++;
     pthread_exit(0);
 }
+    
