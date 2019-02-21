@@ -14,9 +14,9 @@ int column = 0;
 
 //Fuctions
 void getDataFromfile(void * param, FILE * file);
-void validateRow(void *param);
-void validateColumn(void *param);
-void validateSquare(void *param);
+void *validateRow(void *param);
+void *validateColumn(void *param);
+void *validateSquare(void *param);
 void printGrid(void * param);
 
 int main(int argc, char *argv[]) {
@@ -28,54 +28,50 @@ int main(int argc, char *argv[]) {
         printf("Error! Retry please");
         return -1;
     }
-
     for(int i = 0; i < THREADS; i++){
         pthread_attr_init(&attr[i]);
     }
-
+    
     file = fopen(argv[1], "r");
-    int  sudoku[THREADS/3][THREADS/3];
+    int  sudoku[ROWS][COLUMNS];
     getDataFromfile((void *) sudoku, file);
     fclose(file);
-
+    printGrid(sudoku);
     for(int x = 0; x < ROWS; x++){
         pthread_create(&tid[x], &attr[x], validateRow, (void *) sudoku);
         row++;
-    }
-    
+    } 
     for(int x = COLUMNS; x < COLUMNS + COLUMNS; x++){
         pthread_create(&tid[x], &attr[x], validateColumn, (void *) sudoku);
         column++;
     }
-
     column = 0;
     row = 0;
-    for(int x = COLUMNS + COLUMNS; x < x + 3 ; x++){
+    for(int x = 18; x < 21 ; x++){
         pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
         row++;
     }
-
     column += 3;
     row = 0;
-    for(int x = COLUMNS + COLUMNS + 3; x < x + 3; x++){
+    for(int x = 21; x < 24; x++){
         pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
         row++;
     }
-
     row = 0;
     column += 3;
-    for(int x = COLUMNS + COLUMNS + 6; x < x + 3; x++){
+    for(int x = 24; x < 27; x++){
         pthread_create(&tid[x], &attr[x], validateSquare, (void *) sudoku);
         row++;
     }
 
-    for(int j = 0; j < THREADS; j++)
+    for(int j = 0; j < 22; j++)
         pthread_join(tid[j], NULL);
     
     if(valid == '1'){
         printf("The Sudoku is valid\n");
     }
     else{
+        printf("%c",valid);
         printf("The Sudoku is't valid\n");
     }
 }
@@ -99,43 +95,34 @@ void getDataFromfile(void * param, FILE * file){
         }
     }
 }
-void validateRow(void *param){
+void *validateRow(void *param){
     int (*sudoku)[ROWS] = param;
-    int sum = 0;  
-    for(int i = 0; i < 9; i++){
-        sum += sudoku[row][i];
-        if(sum > 45){
-            valid = '0';
-        }else if(sudoku[row][i] > 9 || sudoku[row][i] < 1){
-            valid = '0';
+    for (int i = 0; i < 9; i++){
+        for (int j = i+1; j < 9; j++) {
+            if (sudoku[i][row] == sudoku[j][row]) {
+                valid = '0';
+            }
         }
     }
     pthread_exit(0);
 }
-void validateColumn(void *param){
+void *validateColumn(void *param){
    int (*sudoku)[ROWS] = param;
-   int sum = 0;  
-   for(int i = 0; i < ROWS; i++){
-       sum += sudoku[i][column];
-        if(sum > 45){
-            valid = '0';
-        }else if(sudoku[i][column] > 9 || sudoku[i][column] < 1){
-            valid = '0';
+   for (int i = 0; i < 9; i++){
+        for (int j = i + 1; j < 9; j++) {
+            if (sudoku[i] == sudoku[j]) {
+                valid = '0';
+            }
         }
-   }
+    }
    pthread_exit(0);
 }
-void validateSquare(void *param){
+void *validateSquare(void *param){
     int (*sudoku)[ROWS] = param;
     int sum = 0; 
     for(int j = row; j < row + 3; j++){
-        for(int k = column; k <  column + 3; i++){
-            sum += sudoku[j][k];
-            if(sum > 45){
-                valid = '0';
-            }else if(sudoku[j][k] > 9 || sudoku[j][k] < 1){
-                valid = '0';
-            }
+        for(int k = column; k <  column + 3; k++){
+            
         }   
     }
     pthread_exit(0);
