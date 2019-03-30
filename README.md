@@ -1,5 +1,5 @@
 # Sudoku-verifier
-This is a multi-thread sudoku verifier made in c,each thread verify a diferent column, row or 3x3 square to check if all are valid, that is why i am using a total of 37 threads.
+This is a multi-thread sudoku verifier made in c, each thread verify a diferent column, row or 3x3 square to check if all are valid, that is why i am using a total of 37 threads.
 
 In this project i learn the basics of multi-thread programming.
 
