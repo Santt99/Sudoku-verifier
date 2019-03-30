@@ -4,6 +4,6 @@ This is a multi-thread sudoku verifier made in c, each thread verify a diferent 
 In this project i learn the basics of multi-thread programming.
 
 Technology Stack:
-  1.C
-  2.Lthread
+  1. C
+  2. Lthread
 
